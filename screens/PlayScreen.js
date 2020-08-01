@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import CountDown from "react-native-countdown-component";
+// import CountDown from "react-native-countdown-component";
 import Questions from "./Questions";
 
 export default function PlayScreen({ navigation }) {
@@ -15,32 +15,61 @@ export default function PlayScreen({ navigation }) {
   const [playerOne, seplayerOne] = useState(0);
   const [playerTwo, setplayerTwo] = useState(0);
   const [countdownTimer, setCountdownTimer] = useState(90);
-  const [isRunning, setIsRunning] = useState(false);
-
-  const timerTriger = () => {
-    setIsRunning(true);
-    // if (countdownTimer == 0) {
-    //   setQuestionId(questionId + 1);
-    //   setplayerTwo(playerTwo + 1);
-    // }
-  };
+  const [isActive, setIsActive] = useState(false);
+  const [isHide, setIsHide] = useState(0);
 
   useEffect(() => {
     Alert.alert(
       "გაეცანით წესებს",
       "ავრცელებული მოსაზრებით, Lorem Ipsum შემთხვევითი ტექსტი სულაც არაა. მისი ფესვები ჯერკიდევ ჩვ. წ. აღ-მდე 45 წლის დროინდელი კლასიკური ლათინური ლიტერატურიდან მოდის. ვირჯინიის შტატში მდებარე ჰემპდენ-სიდნეის კოლეჯის პროფესორმა რიჩარდ მაკკლინტოკმა აიღო ერთ-ერთი ყველაზე იშვიათი ლათინური სიტყვა Lorem Ipsum-პასაჟიდან და გადაწყვიტა მოეძებნა იგი კლასიკურ ლიტერატურაში. ძიება შედეგიანი აღმოჩნდა — ტექსტი Lorem Ipsum გადმოწერილი ყოფილა ციცერონის-ის 1.10.32 და 1.10.33 თავებიდან. ეს წიგნი ეთიკის თეორიის ტრაქტატია, რომელიც რენესანსის პერიოდში ძალიან იყო გავრცელებული. Lorem Ipsum-ის პირველი ხაზი, სწორედ ამ წიგნის 1.10.32 თავიდანაა.",
-      [{ text: "OK", onPress: () => timerTriger() }],
+      [{ text: "OK", onPress: () => setIsActive(!isActive) }],
       { cancelable: false }
     );
   }, []);
+
+  useEffect(() => {
+    let interval = null;
+
+    if (isActive) {
+      interval = setInterval(
+        () => setCountdownTimer((countdownTimer) => countdownTimer - 1),
+        1000
+      );
+    } else if (!isActive && countdownTimer !== 0) {
+      clearInterval(interval);
+    }
+
+    if (countdownTimer <= 0) {
+      if (playerTwo === 5) {
+        Alert.alert(
+          "მარცხი !!!! ",
+          "თქვენ დამარცხდით",
+          [{ text: "OK", onPress: () => endingScene() }],
+          { cancelable: false }
+        );
+        clearInterval(interval);
+      } else {
+        setplayerTwo(playerTwo + 1);
+        setQuestionId(questionId + 1);
+        setCountdownTimer(90);
+      }
+    }
+
+    // if (countdownTimer == 88) {
+    //   setIsHide(1);
+    //   console.log(isHide);
+    // }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isActive, countdownTimer]);
 
   const endingScene = () => {
     navigation.navigate("Home");
   };
 
   function checkAnswer(curr) {
-    setQuestionId(questionId + 1);
-
     if (Questions[questionId].correctAnswer == curr) {
       seplayerOne(playerOne + 1);
       if (playerOne === 5) {
@@ -62,20 +91,15 @@ export default function PlayScreen({ navigation }) {
         );
       }
     }
+    setQuestionId(questionId + 1);
+    setCountdownTimer(90);
   }
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.timerItem}>
-          <CountDown
-            until={countdownTimer}
-            timeToShow={["M", "S"]}
-            digitStyle={{ backgroundColor: "#ff0066" }}
-            size={20}
-            style={styles.timer}
-            running={isRunning}
-          />
+          <Text>{countdownTimer}</Text>
         </View>
         <View style={styles.scoreBar}>
           <Text style={styles.scoreBarItem}>{playerOne}</Text>
@@ -86,7 +110,10 @@ export default function PlayScreen({ navigation }) {
           <Text style={styles.question}>{Questions[questionId].title}</Text>
         </View>
         <View style={styles.answersBar}>
-          <TouchableOpacity onPress={() => checkAnswer("a")}>
+          <TouchableOpacity
+            onPress={() => checkAnswer("a")}
+            // style={{ opacity: isHide }}
+          >
             <Text style={styles.answersBarItem}>
               {Questions[questionId].answers.a}
             </Text>
