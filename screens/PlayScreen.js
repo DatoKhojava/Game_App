@@ -10,19 +10,19 @@ import {
 // import CountDown from "react-native-countdown-component";
 import Questions from "./Questions";
 import Description from "./Description";
+import Answer from "./Answer";
 
 export default function PlayScreen({ navigation }) {
   const [questionId, setQuestionId] = useState(0);
   const [playerOne, seplayerOne] = useState(0);
   const [playerTwo, setPlayerTwo] = useState(0);
-  const [countdownTimer, setCountdownTimer] = useState(3);
+  const [countdownTimer, setCountdownTimer] = useState(60);
   const [isActive, setIsActive] = useState(false);
   const [hideDescription, setHideDescription] = useState(false);
   const [hideAnswer, setHideAnswer] = useState(false);
   const [disabledAnswers, setDisabledAnswers] = useState(false);
   const [answerPressed, setAnswerPressed] = useState(false);
-  //answer states
-  const [answerA, setAnswerA] = useState(false);
+  const [earlyAnswer, setEarlyAnswer] = useState(true);
 
   useEffect(() => {
     Alert.alert(
@@ -66,8 +66,10 @@ export default function PlayScreen({ navigation }) {
     setDisabledAnswers(false);
     if (countdownTimer <= 10) {
       setHideAnswer(true);
+      setEarlyAnswer(false);
     } else {
       setHideAnswer(false);
+      setEarlyAnswer(true);
     }
 
     if (countdownTimer <= 0) {
@@ -131,32 +133,32 @@ export default function PlayScreen({ navigation }) {
           >
             {hideAnswer && (
               <Text
-                style={[
-                  styles.default,
-                  setAnswerA || setAnswerB || setAnswerC || setAnswerD
-                    ? {
-                        width: "100%",
-                        alignSelf: "center",
-                        padding: 25,
-                        borderColor: "#bbb",
-                        borderWidth: 1,
-                        borderStyle: "dashed",
-                        borderRadius: 10,
-                        margin: 5,
-                      }
-                    : {
-                        width: "100%",
-                        alignSelf: "center",
-                        padding: 25,
-                        borderColor: "#bbb",
-                        borderWidth: 1,
-                        borderStyle: "dashed",
-                        borderRadius: 10,
-                        margin: 5,
-                        backgroundColor: "#f00",
-                      },
-                ]}
-                // style={styles.answersBarItem}
+                // style={[
+                //   styles.default,
+                //   setAnswerA || setAnswerB || setAnswerC || setAnswerD
+                //     ? {
+                //         width: "100%",
+                //         alignSelf: "center",
+                //         padding: 25,
+                //         borderColor: "#bbb",
+                //         borderWidth: 1,
+                //         borderStyle: "dashed",
+                //         borderRadius: 10,
+                //         margin: 5,
+                //       }
+                //     : {
+                //         width: "100%",
+                //         alignSelf: "center",
+                //         padding: 25,
+                //         borderColor: "#bbb",
+                //         borderWidth: 1,
+                //         borderStyle: "dashed",
+                //         borderRadius: 10,
+                //         margin: 5,
+                //         backgroundColor: "#f00",
+                //       },
+                // ]}
+                style={styles.answersBarItem}
               >
                 {Questions[questionId].answers.a}
               </Text>
@@ -193,6 +195,7 @@ export default function PlayScreen({ navigation }) {
             )}
           </TouchableOpacity>
         </View>
+        {earlyAnswer && <Answer setCountdownTimer={setCountdownTimer} />}
         {hideDescription && (
           <Description
             endingScene={endingScene}

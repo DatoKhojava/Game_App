@@ -31,10 +31,10 @@ export default function Description({
       if (answerPressed == false) {
         setPlayerTwo(playerTwo + 1);
         setQuestionId(questionId + 1);
-        setCountdownTimer(3);
+        setCountdownTimer(60);
       } else {
         setQuestionId(questionId + 1);
-        setCountdownTimer(3);
+        setCountdownTimer(60);
       }
     }
     setAnswerPressed(false);
