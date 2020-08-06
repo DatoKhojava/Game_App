@@ -9,19 +9,25 @@ import {
 } from "react-native";
 // import CountDown from "react-native-countdown-component";
 import Questions from "./Questions";
+import Description from "./Description";
 
 export default function PlayScreen({ navigation }) {
   const [questionId, setQuestionId] = useState(0);
   const [playerOne, seplayerOne] = useState(0);
-  const [playerTwo, setplayerTwo] = useState(0);
-  const [countdownTimer, setCountdownTimer] = useState(90);
+  const [playerTwo, setPlayerTwo] = useState(0);
+  const [countdownTimer, setCountdownTimer] = useState(3);
   const [isActive, setIsActive] = useState(false);
-  const [isHide, setIsHide] = useState(0);
+  const [hideDescription, setHideDescription] = useState(false);
+  const [hideAnswer, setHideAnswer] = useState(false);
+  const [disabledAnswers, setDisabledAnswers] = useState(false);
+  const [answerPressed, setAnswerPressed] = useState(false);
+  //answer states
+  const [answerA, setAnswerA] = useState(false);
 
   useEffect(() => {
     Alert.alert(
       "გაეცანით წესებს",
-      "ავრცელებული მოსაზრებით, Lorem Ipsum შემთხვევითი ტექსტი სულაც არაა. მისი ფესვები ჯერკიდევ ჩვ. წ. აღ-მდე 45 წლის დროინდელი კლასიკური ლათინური ლიტერატურიდან მოდის. ვირჯინიის შტატში მდებარე ჰემპდენ-სიდნეის კოლეჯის პროფესორმა რიჩარდ მაკკლინტოკმა აიღო ერთ-ერთი ყველაზე იშვიათი ლათინური სიტყვა Lorem Ipsum-პასაჟიდან და გადაწყვიტა მოეძებნა იგი კლასიკურ ლიტერატურაში. ძიება შედეგიანი აღმოჩნდა — ტექსტი Lorem Ipsum გადმოწერილი ყოფილა ციცერონის-ის 1.10.32 და 1.10.33 თავებიდან. ეს წიგნი ეთიკის თეორიის ტრაქტატია, რომელიც რენესანსის პერიოდში ძალიან იყო გავრცელებული. Lorem Ipsum-ის პირველი ხაზი, სწორედ ამ წიგნის 1.10.32 თავიდანაა.",
+      "გმადლობთ რომ სარგებლობთ შვენი აპლიკაციით! აპლიკაცია არის ცნობილი თამაშის რა სად როდის - ის პროტოტიპი, აპლიკაციაში შეტანილია რეალური სირთულის კითხვები თქვენ გეძლევად 60 წამი თითო კითხვისთვის 50 წამი საფიქრელად ხოლო დარჩენილ 10 წამში ეკრანზე გამოჩდება სავარაუდო პასუხები, პასუხის ვერ გაცემის შემთხვევაში ქულა ჩაეთვლება მოწინააღმდეგეს.შეგახსენებთ თამაში მიმდინარეობს 6 ქულამმდე",
       [{ text: "OK", onPress: () => setIsActive(!isActive) }],
       { cancelable: false }
     );
@@ -48,30 +54,38 @@ export default function PlayScreen({ navigation }) {
           { cancelable: false }
         );
         clearInterval(interval);
-      } else {
-        setplayerTwo(playerTwo + 1);
-        setQuestionId(questionId + 1);
-        setCountdownTimer(90);
       }
     }
-
-    // if (countdownTimer == 88) {
-    //   setIsHide(1);
-    //   console.log(isHide);
-    // }
 
     return () => {
       clearInterval(interval);
     };
   }, [isActive, countdownTimer]);
 
+  useEffect(() => {
+    setDisabledAnswers(false);
+    if (countdownTimer <= 10) {
+      setHideAnswer(true);
+    } else {
+      setHideAnswer(false);
+    }
+
+    if (countdownTimer <= 0) {
+      setHideDescription(true);
+      setDisabledAnswers(true);
+      setCountdownTimer(0);
+    } else {
+      setHideDescription(false);
+    }
+  }, [countdownTimer]);
+
   const endingScene = () => {
     navigation.navigate("Home");
   };
 
   function checkAnswer(curr) {
+    setAnswerPressed(true);
     if (Questions[questionId].correctAnswer == curr) {
-      seplayerOne(playerOne + 1);
       if (playerOne === 5) {
         Alert.alert(
           "გილოცავთ!!!! ",
@@ -80,8 +94,9 @@ export default function PlayScreen({ navigation }) {
           { cancelable: false }
         );
       }
+      seplayerOne(playerOne + 1);
+      setCountdownTimer(0);
     } else {
-      setplayerTwo(playerTwo + 1);
       if (playerTwo === 5) {
         Alert.alert(
           "მარცხი !!!! ",
@@ -90,9 +105,9 @@ export default function PlayScreen({ navigation }) {
           { cancelable: false }
         );
       }
+      setPlayerTwo(playerTwo + 1);
+      setCountdownTimer(0);
     }
-    setQuestionId(questionId + 1);
-    setCountdownTimer(90);
   }
 
   return (
@@ -112,28 +127,84 @@ export default function PlayScreen({ navigation }) {
         <View style={styles.answersBar}>
           <TouchableOpacity
             onPress={() => checkAnswer("a")}
-            // style={{ opacity: isHide }}
+            disabled={disabledAnswers}
           >
-            <Text style={styles.answersBarItem}>
-              {Questions[questionId].answers.a}
-            </Text>
+            {hideAnswer && (
+              <Text
+                style={[
+                  styles.default,
+                  setAnswerA || setAnswerB || setAnswerC || setAnswerD
+                    ? {
+                        width: "100%",
+                        alignSelf: "center",
+                        padding: 25,
+                        borderColor: "#bbb",
+                        borderWidth: 1,
+                        borderStyle: "dashed",
+                        borderRadius: 10,
+                        margin: 5,
+                      }
+                    : {
+                        width: "100%",
+                        alignSelf: "center",
+                        padding: 25,
+                        borderColor: "#bbb",
+                        borderWidth: 1,
+                        borderStyle: "dashed",
+                        borderRadius: 10,
+                        margin: 5,
+                        backgroundColor: "#f00",
+                      },
+                ]}
+                // style={styles.answersBarItem}
+              >
+                {Questions[questionId].answers.a}
+              </Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => checkAnswer("b")}>
-            <Text style={styles.answersBarItem}>
-              {Questions[questionId].answers.b}
-            </Text>
+          <TouchableOpacity
+            onPress={() => checkAnswer("b")}
+            disabled={disabledAnswers}
+          >
+            {hideAnswer && (
+              <Text style={styles.answersBarItem}>
+                {Questions[questionId].answers.b}
+              </Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => checkAnswer("c")}>
-            <Text style={styles.answersBarItem}>
-              {Questions[questionId].answers.c}
-            </Text>
+          <TouchableOpacity
+            onPress={() => checkAnswer("c")}
+            disabled={disabledAnswers}
+          >
+            {hideAnswer && (
+              <Text style={styles.answersBarItem}>
+                {Questions[questionId].answers.c}
+              </Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => checkAnswer("d")}>
-            <Text style={styles.answersBarItem}>
-              {Questions[questionId].answers.d}
-            </Text>
+          <TouchableOpacity
+            onPress={() => checkAnswer("d")}
+            disabled={disabledAnswers}
+          >
+            {hideAnswer && (
+              <Text style={styles.answersBarItem}>
+                {Questions[questionId].answers.d}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
+        {hideDescription && (
+          <Description
+            endingScene={endingScene}
+            playerTwo={playerTwo}
+            setPlayerTwo={setPlayerTwo}
+            questionId={questionId}
+            setQuestionId={setQuestionId}
+            setCountdownTimer={setCountdownTimer}
+            answerPressed={answerPressed}
+            setAnswerPressed={setAnswerPressed}
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -188,5 +259,8 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderRadius: 10,
     margin: 5,
+  },
+  correctAnswer: {
+    backgroundColor: "#f00",
   },
 });
