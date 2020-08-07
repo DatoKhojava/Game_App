@@ -17,6 +17,10 @@ export default function Description({
   setCountdownTimer,
   answerPressed,
   setAnswerPressed,
+  setAnswerA,
+  setAnswerB,
+  setAnswerC,
+  setAnswerD,
   endingScene,
 }) {
   const nextQuestion = () => {
@@ -38,6 +42,11 @@ export default function Description({
       }
     }
     setAnswerPressed(false);
+    //answers reset
+    setAnswerA(false);
+    setAnswerB(false);
+    setAnswerC(false);
+    setAnswerD(false);
   };
 
   return (

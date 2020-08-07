@@ -23,6 +23,11 @@ export default function PlayScreen({ navigation }) {
   const [disabledAnswers, setDisabledAnswers] = useState(false);
   const [answerPressed, setAnswerPressed] = useState(false);
   const [earlyAnswer, setEarlyAnswer] = useState(true);
+  //answer states
+  const [answerA, setAnswerA] = useState(false);
+  const [answerB, setAnswerB] = useState(false);
+  const [answerC, setAnswerC] = useState(false);
+  const [answerD, setAnswerD] = useState(false);
 
   useEffect(() => {
     Alert.alert(
@@ -85,7 +90,32 @@ export default function PlayScreen({ navigation }) {
     navigation.navigate("Home");
   };
 
+  function answerBackground() {
+    if (Questions[questionId].correctAnswer === "a") {
+      setAnswerA(true);
+      setAnswerB(false);
+      setAnswerC(false);
+      setAnswerD(false);
+    } else if (Questions[questionId].correctAnswer === "b") {
+      setAnswerA(false);
+      setAnswerB(true);
+      setAnswerC(false);
+      setAnswerD(false);
+    } else if (Questions[questionId].correctAnswer === "c") {
+      setAnswerA(false);
+      setAnswerB(false);
+      setAnswerC(true);
+      setAnswerD(false);
+    } else if (Questions[questionId].correctAnswer === "d") {
+      setAnswerA(false);
+      setAnswerB(false);
+      setAnswerC(false);
+      setAnswerD(true);
+    }
+  }
+
   function checkAnswer(curr) {
+    answerBackground();
     setAnswerPressed(true);
     if (Questions[questionId].correctAnswer == curr) {
       if (playerOne === 5) {
@@ -133,6 +163,9 @@ export default function PlayScreen({ navigation }) {
           >
             {hideAnswer && (
               <Text
+                style={
+                  answerA ? styles.answersBarItemGreen : styles.answersBarItem
+                }
                 // style={[
                 //   styles.default,
                 //   setAnswerA || setAnswerB || setAnswerC || setAnswerD
@@ -158,7 +191,7 @@ export default function PlayScreen({ navigation }) {
                 //         backgroundColor: "#f00",
                 //       },
                 // ]}
-                style={styles.answersBarItem}
+                // style={styles.answersBarItem}
               >
                 {Questions[questionId].answers.a}
               </Text>
@@ -169,7 +202,11 @@ export default function PlayScreen({ navigation }) {
             disabled={disabledAnswers}
           >
             {hideAnswer && (
-              <Text style={styles.answersBarItem}>
+              <Text
+                style={
+                  answerB ? styles.answersBarItemGreen : styles.answersBarItem
+                }
+              >
                 {Questions[questionId].answers.b}
               </Text>
             )}
@@ -179,7 +216,11 @@ export default function PlayScreen({ navigation }) {
             disabled={disabledAnswers}
           >
             {hideAnswer && (
-              <Text style={styles.answersBarItem}>
+              <Text
+                style={
+                  answerC ? styles.answersBarItemGreen : styles.answersBarItem
+                }
+              >
                 {Questions[questionId].answers.c}
               </Text>
             )}
@@ -189,7 +230,11 @@ export default function PlayScreen({ navigation }) {
             disabled={disabledAnswers}
           >
             {hideAnswer && (
-              <Text style={styles.answersBarItem}>
+              <Text
+                style={
+                  answerD ? styles.answersBarItemGreen : styles.answersBarItem
+                }
+              >
                 {Questions[questionId].answers.d}
               </Text>
             )}
@@ -206,6 +251,10 @@ export default function PlayScreen({ navigation }) {
             setCountdownTimer={setCountdownTimer}
             answerPressed={answerPressed}
             setAnswerPressed={setAnswerPressed}
+            setAnswerA={setAnswerA}
+            setAnswerB={setAnswerB}
+            setAnswerC={setAnswerC}
+            setAnswerD={setAnswerD}
           />
         )}
       </View>
@@ -262,6 +311,28 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderRadius: 10,
     margin: 5,
+  },
+  answersBarItemRed: {
+    width: "100%",
+    alignSelf: "center",
+    padding: 25,
+    borderColor: "#bbb",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderRadius: 10,
+    margin: 5,
+    backgroundColor: "#f00",
+  },
+  answersBarItemGreen: {
+    width: "100%",
+    alignSelf: "center",
+    padding: 25,
+    borderColor: "#bbb",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderRadius: 10,
+    margin: 5,
+    backgroundColor: "#0f0",
   },
   correctAnswer: {
     backgroundColor: "#f00",
